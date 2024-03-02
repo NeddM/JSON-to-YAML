@@ -1,0 +1,36 @@
+name: "JSON to YAML"
+description: "Action to parse JSON files to YAML files"
+
+branding:
+  icon: "copy"
+  color: "green"
+
+inputs:
+    input:
+        description: "The JSON file path"
+        required: true
+    output:
+        description: "The YAML file path"
+        required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install yq tool
+      shell: bash
+      continue-on-error: true
+      run: |
+        if ! command -v yq &> /dev/null; then
+            echo "yq is not installed. Installing..."
+            sudo apt update
+            sudo apt install yq
+        else
+            echo "yq already installed."
+        fi
+
+    - name: Parse to JSON
+      shell: bash
+      run: |
+        echo "Parse to YAML"
+        yq -p json -o yaml ${{inputs.input}} > ${{ inputs.output }}
+
